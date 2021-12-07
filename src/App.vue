@@ -48,7 +48,7 @@ body {
 } */
 
 button {
-  font-family: 'Raleway', sans-serif;;
+  font-family: 'Raleway', sans-serif;
 }
 .button {
   text-decoration: none;

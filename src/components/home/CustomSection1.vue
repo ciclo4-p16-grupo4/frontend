@@ -37,7 +37,7 @@ export default {
   methods: {
     getInmuebles(queryParams) {
       fetch(`${process.env.VUE_APP_API}inmuebles/?${queryParams}`).then(data =>data.json()).then(json => {
-        this.inmuebles = json
+        this.inmuebles = json.results
       })
     },
     right() {

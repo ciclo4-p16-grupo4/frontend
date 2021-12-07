@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Details from '../views/Details.vue'
+import Search from '../views/Search.vue'
 import Admin from '../views/Admin.vue'
 import User from '../views/User.vue'
 import Signup from '../components/users/Signup.vue'
 import Login from '../components/users/Login.vue'
+import MapResults from '../components/search/MapResults.vue'
+import ListResults from '../components/search/ListResults.vue'
 import Error404Page from '../components/home/404Page.vue'
 import store from '../store/index.js'
 
@@ -21,6 +24,26 @@ const routes = [
     path: '/details/:id',
     name: 'Details',
     component: Details
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: Search,
+    children: [
+      {
+        path: '',
+        redirect: '/search/list'
+      },
+      {
+        path: 'list',
+        alias: 'list',
+        component: ListResults,
+      },
+      {
+        path: 'map',
+        component: MapResults
+      }
+    ]
   },
   /** User /login & signup */
 

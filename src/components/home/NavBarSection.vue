@@ -34,7 +34,7 @@
           <router-link to="/admin">Admin</router-link>
         </li>
         <li>
-          <router-link to="/contacto">Contacto</router-link>
+          <router-link to="/search">Buscar</router-link>
         </li> 
       </ul>
 
