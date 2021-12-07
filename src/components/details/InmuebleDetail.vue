@@ -3,7 +3,7 @@
 	  <div class="top-section">
       <div class="meta-title">
         <h1>{{inmueble.titulo}}</h1>
-      <div>
+        <div>
           <h2>{{Intl.NumberFormat('es-CO',{style: 'currency', currency: 'COP'}).format(inmueble.precio)}}</h2>
         </div>
       <div class="in-details">
@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     getInmueble() {
-      fetch(`${process.env.VUE_APP_API}inmuebles/${this.$route.params.id}`).then(data => data.json()).then(json => {
+      fetch(`${process.env.VUE_APP_API}inmuebles/${this.$route.params.id}/`).then(data => data.json()).then(json => {
         this.inmueble = json
       })
     }
