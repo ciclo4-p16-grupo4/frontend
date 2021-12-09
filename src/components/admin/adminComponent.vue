@@ -122,11 +122,11 @@ export default {
 	  },
 	  getAll() {
       let status_code = null
-      fetch(`${process.env.VUE_APP_API}inmuebles/?order_by=creado&sort=DESC`).then(data => {
+      fetch(`${process.env.VUE_APP_API}inmuebles/?order_by=creado&sort=DESC&limit=10000`).then(data => {
         status_code = data.status
         return data
       }).then(data => data.json()).then(json => {
-        this.inmuebles = json
+        this.inmuebles = json.results
       })    
 	  },
     eliminar(id) {

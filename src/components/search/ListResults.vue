@@ -7,7 +7,7 @@
 	
 	<div v-else class="results-list">
 		<div class="label">
-			<label>{{inmuebles.results.length}} - {{inmuebles.count}} Resultados</label>
+			<label>{{inmuebles.count}} Resultados</label>
 		</div>
 		<div v-if="inmuebles.results.length==0" class="no-search-term">
 			<center>
@@ -104,9 +104,11 @@ export default {
 }
 
 .button-pagination-page {
+	
 	padding: 10px;
 	background-color: var(--oposite-color);
 	margin: 0px 10px;
+	border-radius: 5px;
 }
 .pagination-container a{
 	cursor: pointer;

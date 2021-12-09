@@ -4,7 +4,7 @@
 			<input v-model="search.q" type="search" placeholder="Casa finca Villeta, Cundinamarca" name="" id="">
 		</div>
 		<div class="search-opt">
-			<a @click="buscar()" class="button red-action">Buscar</a>
+			<a @click="buscar(currentPage = 1)" class="button red-action">Buscar</a>
 			<select name="order_by" id="order" v-model="search.order_by">
 				<option value="id">id</option>
 				<option value="titulo">Titulo</option>
@@ -24,9 +24,14 @@
 				<option value="ASC">Acendente</option>
 				<option value="DESC">Decentente</option>
 			</select>
-			
+			<br>
 		</div>
 	</div>
+	<!-- <pre>
+		search_opt: {{search}}
+		current_page: {{currentPage}}
+		pages_number: {{pageNumber}}
+	</pre> -->
 	<div class="buttons-tabs">
 		<router-link to="/search/list">
 			<svg width="20px" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="list-ul" class="svg-inline--fa fa-list-ul fa-w-16" role="img" viewBox="0 0 512 512"><path fill="currentColor" d="M48 48a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm0 160a48 48 0 1 0 48 48 48 48 0 0 0-48-48zm448 16H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"/></svg>
@@ -60,11 +65,14 @@ export default {
 				order_by: 'id',
 				sort: 'ASC'
 			},
-			defaultOffset: 5
+			defaultOffset: 12
 		}
 	},
 
 	methods: {
+		ada() {
+			
+		},
 		buscar() {
 			this.isLoading = true
 			const offset = this.defaultOffset*(this.currentPage-1)
