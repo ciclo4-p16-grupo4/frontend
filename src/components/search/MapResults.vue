@@ -51,7 +51,7 @@ export default {
 
 					var el = document.createElement('div');
 					el.className = 'marker-inmueble';
-					el.innerHTML = `<div></div>`
+					el.innerHTML = `<div>${i+1}</div>`
 					let dii = marker.imagenes[0]?marker.imagenes[0].url:'https://i.imgur.com/4PhhbBv.png'
 					new mapboxgl.Marker(el)
 					.setLngLat({lon: coordernadas[1], lat: coordernadas[0]})
@@ -122,6 +122,12 @@ export default {
 	height: 20px;
 	width: 20px;
 	box-shadow: 0px 3px 8px rgba(254, 34, 34, 0.4);
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+	color: var(--oposite-color);
+	cursor: pointer;
 }
 .mapboxgl-popup-content {
 	border-radius: 20px!important;
