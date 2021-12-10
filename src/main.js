@@ -3,9 +3,11 @@ import App from './App.vue'
 import router from './router'
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
 import { createApolloProvider } from '@vue/apollo-option'
+import store from './store'
+import { vfmPlugin } from 'vue-final-modal'
 import { setContext } from 'apollo-link-context'
 const httpLink = createHttpLink({
-    uri: 'https://gcuatroapigateway.herokuapp.com/',
+    uri: process.env.VUE_APP_API,
 })
 const authLink = setContext((_, { headers }) => {
     return {
@@ -22,4 +24,4 @@ const apolloClient = new ApolloClient({
 const apolloProvider = new createApolloProvider({
     defaultClient: apolloClient
 })
-createApp(App).use(router).use(apolloProvider).mount('#app')
+createApp(App).use(store).use(router).use(vfmPlugin).use(apolloProvider).mount('#app')
