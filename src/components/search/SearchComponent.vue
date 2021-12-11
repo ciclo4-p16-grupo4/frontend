@@ -1,7 +1,7 @@
 <template>
 	<div class="search-nav">
 		<div class="search-input">
-			<input v-model="search.q" type="search" placeholder="Casa finca Villeta, Cundinamarca" name="" id="">
+			<input v-model="this.search.q" type="search" placeholder="Casa finca Villeta, Cundinamarca" name="" id="">
 		</div>
 		<div class="search-opt">
 			<a @click="buscar(currentPage = 1)" class="button red-action">Buscar</a>
@@ -53,47 +53,98 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 export default {
 	data: function() {
 		return {
 			isLoading: false,
 			results: null,
 			pageNumber: null,
-			currentPage: 1,
+			currentPage: this.$route.query.page || 1,
 			search: {
 				q: this.$route.query.q,
-				order_by: 'id',
-				sort: 'ASC'
+				order_by: this.$route.order || 'id',
+				sort: this.$route.sort || 'ASC',
+				offset: null,
+				limit: null
 			},
 			defaultOffset: 12
 		}
 	},
-
+	apollo: {
+		serachInmuebles: {
+			manual: true,
+			query: gql`
+				query SerachInmuebles($q: String!, $order: String, $sort: String, $offset: Int, $limit: Int) {
+					serachInmuebles(q: $q, order: $order, sort: $sort, offset: $offset, limit: $limit) {
+						count
+						results {
+							id
+							likes
+							titulo
+							direccion
+							ciudad
+							poblacion
+							tipo
+							precio
+							area
+							habitaciones
+							banos
+							estrato
+							contrato
+							descripcion
+							coordenadas
+							imagenes {
+								url
+							}
+						}
+					}
+				}
+			`,
+			variables() {
+				return {
+					q: this.search.q,
+					order: this.search.order_by,
+					sort: this.search.sort,
+					offset: this.defaultOffset*(this.currentPage-1),
+					limit: this.defaultOffset*(this.currentPage)
+				}
+			},
+			deep: false,
+			skip() {
+				return true	
+			},
+			manual: true,
+			result ({ data, loading }) {
+				if (!loading) {
+					this.results = data.serachInmuebles
+					this.pageNumber = Math.ceil(Number(this.results.count/this.defaultOffset))
+				}
+			},
+		}
+	},
 	methods: {
-		ada() {
-			
-		},
-		buscar() {
+		async buscar() {
 			this.isLoading = true
-			const offset = this.defaultOffset*(this.currentPage-1)
-			const limit = this.defaultOffset*(this.currentPage)
-			const queries = `?q=${this.search.q}&order_by=${this.search.order_by}&sort=${this.search.sort}&offset=${offset}&limit=${limit}`
-			fetch(`${process.env.VUE_APP_API}inmuebles/search${queries}`)
-				.then(data => data.json()).then((results) => {
-					this.results = results
-					this.$router.replace({ query: {q: this.search.q} })
-					this.isLoading = false
-					this.pageNumber = Math.ceil(Number(results.count/this.defaultOffset))
-				})
+			this.$router.replace({ 
+				query: {
+					q: this.search.q, 
+					page: this.currentPage, 
+					order: this.search.order_by, 
+					sort: this.search.sort
+				}
+			})
+			this.$apollo.queries.serachInmuebles.skip = false
+			await this.$apollo.queries.serachInmuebles.refetch();
+			this.$apollo.queries.serachInmuebles.skip = true
+			this.isLoading = false
 		},
 		changePage(page) {
 			this.currentPage = page
-			console.log('change: '+page);
 			this.buscar()
 		}
 	},
 	mounted() {
-		console.log('qqq: '+this.search.q);
 		if(this.search.q != undefined) {
 			this.buscar()
 		}
