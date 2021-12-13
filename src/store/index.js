@@ -101,29 +101,31 @@ export default createStore({
       }
     },
 
-    refreshToken({ dispatch, commit }) {
+    async refreshToken({ dispatch, commit }) {
       if(this.state.is_auth) {
-        fetch(`${process.env.VUE_APP_API}user/${this.state.loguedUser.user_id}/`, {
-          headers: {
-            'Authorization': `Bearer ${this.state.loguedUser.access_token}`
-          }
-        }).then(data => {
-          if(data.status == 401) {
-            fetch(`${process.env.VUE_APP_API}refresh/`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                'refresh': this.state.loguedUser.refresh_token
-              })
-            }).then(data => data.json()).then(json => {
-              this.state.loguedUser.access_token = json.access
-              localStorage.setItem("token_access", this.state.loguedUser.access_token)
-              dispatch('verifyAuth')
-            })
-          }
-        })
+        await this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation ($refresh: String!) {
+              refreshToken(refresh: $refresh) {
+                access
+                }        
+              }
+            `,
+            variables: {
+              refresh: localStorage.getItem("token_refresh"),
+            },
+          })
+          .then((result) => {
+            this.state.loguedUser.access_token = json.access
+            localStorage.setItem("token_access", result.data.refreshToken.access);
+            dispatch('verifyAuth')
+          })
+          .catch((error) => {
+            dispatch("logOut");
+            alert("su sesión expiró");
+            return;
+          });
       }
     },
     
