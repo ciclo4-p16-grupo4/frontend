@@ -3,7 +3,7 @@
     <div class="portada-elements">
       <h1>Venta y Alquiler De Inmuebles </h1>
       <p>
-        Compra, arrienda y alquila los mejores inmuebles del pais en un solo lugar
+        Compra, arrienda y alquila los mejores inmuebles del país en un solo lugar
       </p>
       <a class="button red-action" href="/user/login">Aprende más</a>
       <SearchBar />

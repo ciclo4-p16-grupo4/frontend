@@ -19,8 +19,9 @@
 </template>
 
 <script>
-// @ is an alias to /src
+import gql from 'graphql-tag'
 import InmuebleCard from '../Inmuebles/InmuebleCard.vue'
+
 export default {
   name: 'CS1',
   components: {
@@ -28,18 +29,55 @@ export default {
   },
   data() {
     return {
-      inmuebles: Array
+      inmuebles: Array,
+      ciudad: localStorage.getItem("ciudad") || 'Bogota',
     }
   },
-  mounted() {
-    this.getInmuebles('order_by=ciudad&sort=ASC&limit=20')
+  apollo: {
+    allInmuebles: {
+      query: gql`
+        query AllInmuebles($order: String, $sort: String, $limit: Int) {
+          allInmuebles(order: $order, sort: $sort, limit: $limit) {
+            count
+            results {
+              id
+              likes
+              titulo
+              tipo
+              ciudad
+              direccion
+              poblacion
+              precio
+              habitaciones
+              area
+              banos
+              estrato
+              contrato
+              imagenes {
+                url
+              }
+              coordenadas
+              descripcion
+            }
+          }
+        }
+      `,
+      variables() {
+        return {
+          order: "ciudad",
+          sort: "ASC",
+          limit: 20
+        }
+      },
+      result ({ data, loading }) {
+				if (!loading) {
+					this.inmuebles = data.allInmuebles.results
+				}
+			}
+    }
   },
   methods: {
-    getInmuebles(queryParams) {
-      fetch(`${process.env.VUE_APP_API}inmuebles/?${queryParams}`).then(data =>data.json()).then(json => {
-        this.inmuebles = json.results
-      })
-    },
+   
     right() {
       // let inPage = Math.round(window.innerWidth/360)
       // // this.$refs.[inPage/2].focus();

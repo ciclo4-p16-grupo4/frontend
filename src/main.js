@@ -10,18 +10,21 @@ import { setContext } from 'apollo-link-context'
 const httpLink = createHttpLink({
     uri: process.env.VUE_APP_API,
 })
-const authLink = setContext((_, { headers }) => {
+
+const authLink = setContext((_, {headers}) => {
+    const token = _.variables.reqAuth?localStorage.getItem('token_access'):null
     return {
         headers: {
             ...headers,
-            "Authorization": localStorage.getItem("token_access") || ""
+            authorization: token ? token: "",
         }
     }
-})
+});
 const apolloClient = new ApolloClient({
     link: authLink.concat(httpLink),
     cache: new InMemoryCache()
 })
+
 const apolloProvider = new createApolloProvider({
     defaultClient: apolloClient
 })

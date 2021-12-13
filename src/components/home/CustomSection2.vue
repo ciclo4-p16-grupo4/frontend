@@ -23,6 +23,7 @@
 
 <script>
 import InmuebleCard from '../Inmuebles/InmuebleCard.vue'
+import gql from 'graphql-tag'
 
 export default {
   name: 'CS2',
@@ -34,16 +35,49 @@ export default {
       inmuebles: Array
     }
   },
-  mounted() {
-    this.getInmuebles('order_by=creado&sort=DESC&limit=6')
-  },
-  methods: {
-    getInmuebles(queryParams) {
-      fetch(`${process.env.VUE_APP_API}inmuebles/?${queryParams}`).then(data =>data.json()).then(json => {
-        this.inmuebles = json.results
-      })
+  apollo: {
+    allInmuebles: {
+      query: gql`
+        query AllInmuebles($order: String, $sort: String, $limit: Int) {
+          allInmuebles(order: $order, sort: $sort, limit: $limit) {
+            count
+            results {
+              id
+              likes
+              titulo
+              tipo
+              ciudad
+              direccion
+              poblacion
+              precio
+              habitaciones
+              area
+              banos
+              estrato
+              contrato
+              imagenes {
+                url
+              }
+              coordenadas
+              descripcion
+            }
+          }
+        }
+      `,
+      variables() {
+        return {
+          order: "creado",
+          sort: "DESC",
+          limit: 6
+        }
+      },
+      result ({ data, loading }) {
+				if (!loading) {
+					this.inmuebles = data.allInmuebles.results
+				}
+			}
     }
-  }
+  },
 }
 </script>
 

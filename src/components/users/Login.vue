@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import gql from 'graphql-tag'
 
 export default {
   name: "LogIn",
@@ -34,29 +34,63 @@ export default {
   },
 
   methods: {
-    processLogInUser: function () {
-      axios
-        .post(
-          `${process.env.VUE_APP_API}login/`,
-          this.user,
-          {headers: {'Content-Type': 'application/json'}}          
-        )
-        .then((result) => {
-          let dataLogIn = {
-            username: this.user.username,
-            token_access: result.data.access,
-            token_refresh: result.data.refresh,
-          };
+    processLogInUser: async function () {
+      await this.$apollo
+      .mutate({
+        mutation: gql`
+          mutation Mutation($credentials: CredentialsInput!) {
+            logIn(credentials: $credentials) {
+              refresh
+              access
+            }
+          }
+        `,
+        variables: {
+          credentials: this.user,
+        },
+      })
+      .then((result) => {
+        console.log(result);
+        let dataLogIn = {
+          username: this.user.username,
+          token_access: result.data.logIn.access,
+          token_refresh: result.data.logIn.refresh,
+        };
 
-          this.$store.dispatch('completedLogIn', {param: dataLogIn})
-          //console.log(this.$store.state);
-        })
-        .catch((error) => {
-          if (error.response.status == "401")
-            alert("ERROR 401: Credenciales Incorrectas.")
-          if (error.response.status == "400")
-            alert("ERROR 400: Los datos ingresados son incorrectos\n")
-        });
+        this.$store.dispatch('completedLogIn', {param: dataLogIn, vm: this})
+      })
+      .catch((errors) => {
+        console.log(errors);
+        alert("ERROR: Credenciales Incorrectas."+'\n'+errors.message)
+      });
+
+
+
+
+
+
+      // axios
+      //   .post(
+      //     `${process.env.VUE_APP_API}login/`,
+      //     this.user,
+      //     {headers: {'Content-Type': 'application/json'}}          
+      //   )
+      //   .then((result) => {
+      //     let dataLogIn = {
+      //       username: this.user.username,
+      //       token_access: result.data.access,
+      //       token_refresh: result.data.refresh,
+      //     };
+
+      //     this.$store.dispatch('completedLogIn', {param: dataLogIn})
+      //     //console.log(this.$store.state);
+      //   })
+      //   .catch((error) => {
+      //     if (error.response.status == "401")
+      //       alert("ERROR 401: Credenciales Incorrectas.")
+      //     if (error.response.status == "400")
+      //       alert("ERROR 400: Los datos ingresados son incorrectos\n")
+      //   });
     },
   },
 };

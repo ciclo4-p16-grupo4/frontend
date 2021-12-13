@@ -31,9 +31,8 @@
       </div>
       <div class="image-gallery">
         <Gallery :imagenes="inmueble.imagenes" />
-
-    <h4>Ubicación</h4>
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31812.93796188539!2d-74.10404450950797!3d4.662142452854003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9bfd2da6cb29%3A0x239d635520a33914!2zQm9nb3TDoQ!5e0!3m2!1ses!2sco!4v1639119945081!5m2!1ses!2sco" width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        <h4>Ubicación</h4>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31812.93796188539!2d-74.10404450950797!3d4.662142452854003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9bfd2da6cb29%3A0x239d635520a33914!2zQm9nb3TDoQ!5e0!3m2!1ses!2sco!4v1639119945081!5m2!1ses!2sco" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
 	  </div>
     <div class="bottom-section">
@@ -42,31 +41,31 @@
       <p>{{inmueble.descripcion}}</p>
     </div>
 
-<article>   
+  <div class="contact-form">   
     <h1 id="tituloFormulario">¿Estas interesado?</h1>
     <p>envia el formulario y nos pondremos en contacto</p>
     <form v-on:submit.prevent="contactoAsesorLog" id="formulario" target="_blank">
 
-        <label>Nombre y Apellido</label>
-        <input v-model="contactoAsesor.name"  type="text" placeholder="Nombre Apellido" class="formularioCampos">
+      <label>Nombre y Apellido</label>
+      <input v-model="contactoAsesor.name"  type="text" placeholder="Nombre Apellido" class="formularioCampos">
 
-        <label>Correo</label>
-        <input  v-model="contactoAsesor.email" type="email" placeholder="correo@email.com" class="formularioCampos">
+      <label>Correo</label>
+      <input  v-model="contactoAsesor.email" type="email" placeholder="correo@email.com" class="formularioCampos">
 
-        <label>Telefono</label>
-        <input  v-model="contactoAsesor.phone" type="tel" placeholder="3201234567" class="formularioCampos">
+      <label>Telefono</label>
+      <input  v-model="contactoAsesor.phone" type="tel" placeholder="3201234567" class="formularioCampos">
 
-        <select v-model="contactoAsesor.asunto" class="formularioCampos" placeholder="Asunto">
-            <option value="" disabled hidden selected>Selecciona un Asunto</option>
-            <option>Quiero Comprar</option>
-            <option>Quiero Mas Informacion</option>
-        </select>
+      <select v-model="contactoAsesor.asunto" class="formularioCampos" placeholder="Asunto">
+          <option value="" disabled hidden selected>Selecciona un asunto</option>
+          <option>Quiero comprar</option>
+          <option>Quiero más información</option>
+      </select>
 
-        <textarea v-model="contactoAsesor.message"  id="" cols="60" rows="7" placeholder="Mensaje" class="formularioCampos"></textarea>
+      <textarea v-model="contactoAsesor.message"  id="" cols="60" rows="7" placeholder="Mensaje" class="formularioCampos"></textarea>
 
-        <button type="submit" class="formularioBoton">Enviar</button>
+      <button type="submit" class="button red-action formularioBoton">Enviar</button>
     </form>
-</article>
+  </div>
 
   </section> 
   <section v-else class="loading">
@@ -79,34 +78,63 @@
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
 import Gallery from './Gallery.vue'
+import gql from 'graphql-tag'
 
 export default {
   name: 'Details',
   data: function() {
     return {
       inmueble: null,
-
+      inmuebleId: Number(this.$route.params.id),
       contactoAsesor: {
-                  name: "",
-                  email: "",
-                  phone_number: "",
-                  asunto:"",
-                  message:""
-    },
+        name: "",
+        email: "",
+        phone_number: "",
+        asunto:"",
+        message:""
+      },
     }
   },
   components: {
     HelloWorld,
     Gallery
   },
-  mounted() {
-    this.getInmueble()
-  },
-  methods: {
-    getInmueble() {
-      fetch(`${process.env.VUE_APP_API}inmuebles/${this.$route.params.id}/`).then(data => data.json()).then(json => {
-        this.inmueble = json
-      })
+  apollo: {
+    inmuebleById: {
+      query: gql`
+        query InmuebleById($inmuebleId: Int!) {
+          inmuebleById(inmuebleId: $inmuebleId) {
+            id
+            likes
+            titulo
+            direccion
+            ciudad
+            poblacion
+            tipo
+            precio
+            area
+            banos
+            habitaciones
+            estrato
+            contrato
+            descripcion
+            coordenadas
+            imagenes {
+              url
+            }
+          }
+        }
+      `,
+      variables() {
+        return {
+          inmuebleId: this.inmuebleId
+        }
+      },
+      result ({ data, loading }) {
+				if (!loading) {
+					this.inmueble = data.inmuebleById
+				}
+			},
     }
   }
 }
@@ -125,30 +153,30 @@ export default {
 #formulario{
   display:flex;
   flex-direction:column;
-  font-size: 20px;
+  font-size: 18px;
+  width: 100%;
 }
 
 .formularioCampos{
   padding: 10px;
-  border: 1px solid rgb(255, 0, 0);
+  border: 1px solid var(--color-principal);
   margin-bottom:15px;
-  margin-right: 700px;
-  font-size: 17px;
+  margin-top: 10px;
+  font-size: 20px;
+  font-family: 'Raleway', sans-serif;
 }
 
 .formularioBoton{
-  padding: 10px;
-  background-color: red;
-  border: 2px solid rgb(255, 0, 0);
-  color: rgb(255, 255, 255);
-  border-radius: 7px;
-  margin-bottom:15px;
-  margin-right: 700px;
-  font-size: 17px;
+  width: 100%;
+
 }
-
-
-
+.contact-form p {
+  max-width: 100%;
+}
+.contact-form {
+  max-width: 40%;
+  margin-top: 150px;
+}
 
 
 .loc {
