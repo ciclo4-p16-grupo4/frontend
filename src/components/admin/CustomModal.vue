@@ -5,6 +5,7 @@
       classes="modal-container"
       content-class="modal-content"
     >
+      <!-- <pre style="width: 100px">{{inmueble}}</pre> -->
       <button class="modal__close" @click="showModal = false">x</button>
       <span v-if="!inmueble.id" class="modal__title"
         >Añadir nuevo inmueble</span
@@ -13,8 +14,8 @@
 
       <div class="modal__content">
         <form
-          class="modal__content"
-          v-on:submit.prevent="inmueble.id ? actualizarInmueble() : send()"
+          class="form-container"
+          v-on:submit.prevent="inmueble.id ? actualizarInmueble() : nuevoInmueble()"
         >
           <label for="titulo">Título</label>
           <input
@@ -56,6 +57,16 @@
             placeholder="ingrese el valor del atributo src desde google maps"
             required
           ></textarea>
+
+          <label for="precio">Coordenadas</label>
+          <input
+            v-model="inmueble.coordenadas"
+            type="text"
+            name="coordenadas"
+            id="coordenadas"
+            placeholder="Coordenadas"
+            required
+          />
 
           <div class="dos-selects">
             <select
@@ -222,87 +233,166 @@
 
 
 <script>
-import gql from 'graphql-tag'
+import gql from "graphql-tag";
 export default {
-  data: function() {
+  data: function () {
     return {
-      new_image: null    
-    }
+      new_image: null,
+    };
   },
   props: {
-	  showModal: false,
-    inmueble: Object
+    showModal: false,
+    inmueble: Object,
   },
-  watch:{
+  watch: {
     showModal(a) {
-      if(a==false) {
-        this.$emit('close')
+      if (a == false) {
+        this.$emit("close");
       }
-    }
+    },
   },
-  mounted(){
-    console.log(this.inmueble)
+  mounted() {
+    console.log(this.inmueble);
   },
   methods: {
     addImage(d) {
-      this.inmueble.imagenes.push({url: this.new_image})
-      this.new_image = ''
+      //console.log(this.inmueble.imagenes);
+      const newImg = {url: this.new_image }
+      const arr = [...this.inmueble.imagenes]
+      console.log(arr);
+      arr.push(newImg)
+      this.inmueble.imagenes = arr
+      this.new_image = "";
     },
 
     /** EDITAR UN INMUEBLE */
 
-     actualizarInmueble: async function() {
-      let status_code = null
+    actualizarInmueble: async function () {
+      await this.$store.dispatch("refreshToken", { vm: this });
       
-      this.$store.dispatch('refreshToken')
+      const inmuebleId = this.inmueble.id;
+      delete this.inmueble.id;
 
-          await this.$apollo.mutate({
-            mutation: gql`
-              mutation InmueblesUpdate($inmueblesinput: updateInmuebleInput!, $inmuebleId: Int!) {
-                inmueblesUpdate(inmueblesinput: $inmueblesinput, inmuebleId: $inmuebleId) {
-                  data {
-                    id
-                    likes
-                    titulo
-                    direccion
-                    ciudad
-                    poblacion
-                    precio
-                    tipo
-                    area
-                    habitaciones
-                    banos
-                    estrato
-                    contrato
-                    descripcion
-                    coordenadas
-                    source_mapas
-                    imagenes {
-                      url
-                    }
+      this.inmueble.precio = String(this.inmueble.precio)
+      this.inmueble.habitaciones = Number(this.inmueble.habitaciones)
+      this.inmueble.banos = Number(this.inmueble.banos)
+      this.inmueble.estrato = Number(this.inmueble.estrato)
+
+      await this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation InmueblesUpdate(
+              $inmueblesinput: updateInmuebleInput!
+              $inmuebleId: Int!
+            ) {
+              inmueblesUpdate(
+                inmueblesinput: $inmueblesinput
+                inmuebleId: $inmuebleId
+              ) {
+                data {
+                  id
+                  likes
+                  titulo
+                  direccion
+                  ciudad
+                  poblacion
+                  precio
+                  tipo
+                  area
+                  habitaciones
+                  banos
+                  estrato
+                  contrato
+                  descripcion
+                  coordenadas
+                  source_mapas
+                  imagenes {
+                    url
                   }
-                  detail
                 }
+                detail
+              }
             }
-            `,
-            variables: {
-              inmueblesinput: this.inmueble,
-              inmuebleId: Number(this.inmueble.id)
-            },
-          })
-          .then( (result) => {
-            alert("Transacción creada exitosamente, por favor revise el historial");
-          })
-          .catch( (error) => {
-            // console.log(error.graphQLErrors[0].extensions.response.body);
-            alert(error.graphQLErrors[0].extensions.response.body);
-          })
+          `,
+          variables: {
+            inmueblesinput: this.inmueble,
+            inmuebleId: Number(inmuebleId),
+            reqAuth: true,
           },
-        },
-      };
+        })
+        .then((result) => {
+          console.log(result);
+          alert(
+            "Inmueble editado exitosamente!!"
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+          //alert(error.graphQLErrors[0].extensions.response.body);
+        });
+    },
+    async nuevoInmueble() {
+      await this.$store.dispatch("refreshToken", { vm: this });
+      
+      delete this.inmueble.id;
+      delete this.inmueble.creado
+      delete this.inmueble.actualizado
 
-    /** CREAR UN INMUEBLE */
-                       
+      this.inmueble.precio = String(this.inmueble.precio)
+      this.inmueble.habitaciones = Number(this.inmueble.habitaciones)
+      this.inmueble.banos = Number(this.inmueble.banos)
+      this.inmueble.estrato = Number(this.inmueble.estrato)
+
+      await this.$apollo
+        .mutate({
+          mutation: gql`
+          mutation InmueblesCreate($inmueblesInput: inmuebleInput!) {
+            inmueblesCreate(inmueblesInput: $inmueblesInput) {
+              detail
+              data {
+                id
+                likes
+                direccion
+                poblacion
+                ciudad
+                titulo
+                precio
+                tipo
+                area
+                habitaciones
+                estrato
+                banos
+                contrato
+                descripcion
+                coordenadas
+                source_mapas
+                imagenes {
+                  url
+                }
+              }
+            }
+          }
+          `,
+          variables: {
+            inmueblesInput: this.inmueble,
+            reqAuth: true,
+          },
+        })
+        .then((result) => {
+          console.log(result);
+          alert(
+            "Inmueble creado exitosamente!!"
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+          //alert(error.graphQLErrors[0].extensions.response.body);
+        });
+    }
+  },
+};
+
+/** CREAR UN INMUEBLE */
 </script>
 
 
@@ -316,8 +406,8 @@ export default {
   position: relative;
   display: flex;
   flex-direction: column;
+  max-height: 90%;
   margin: 0 1rem;
-  padding: 1rem 50px;
   border: 1px solid #e2e8f0;
   border-radius: 0.25rem;
   background: #fff;
@@ -326,17 +416,23 @@ export default {
   margin: 0 2rem 0 0;
   font-size: 1.5rem;
   font-weight: 700;
+  padding: 1rem 1rem;
 }
 .modal__close {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
 }
-.modal__content {
+.form-container {
   display: flex;
   flex-direction: column;
-  padding: 5px 0px;
   width: 400px;
+  padding: 1rem 50px;
+}
+.modal__content {
+  flex-grow: 1;
+  
+  overflow-y: auto;
 }
 .modal__content label {
   margin-bottom: 10px;

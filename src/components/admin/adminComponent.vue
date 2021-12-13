@@ -51,7 +51,7 @@
             <span v-else>Alquiler</span>
           </td>
 					<td class="ver"><a :href="`../details/${inmueble.id}`" target="_blank"><svg height="15" width="15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="external-link-alt" class="svg-inline--fa fa-external-link-alt fa-w-16" role="img" viewBox="0 0 512 512"><path fill="currentColor" d="M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM488,0h-128c-21.37,0-32.05,25.91-17,41l35.73,35.73L135,320.37a24,24,0,0,0,0,34L157.67,377a24,24,0,0,0,34,0L435.28,133.32,471,169c15,15,41,4.5,41-17V24A24,24,0,0,0,488,0Z"/></svg><br>Ver</a></td>
-					<td><button @click="selectedInmueble=inmueble; s=true" class="action-button edit"><svg width="15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="edit" class="svg-inline--fa fa-edit fa-w-18" role="img" viewBox="0 0 576 512"><path fill="currentColor" d="M402.6 83.2l90.2 90.2c3.8 3.8 3.8 10 0 13.8L274.4 405.6l-92.8 10.3c-12.4 1.4-22.9-9.1-21.5-21.5l10.3-92.8L388.8 83.2c3.8-3.8 10-3.8 13.8 0zm162-22.9l-48.8-48.8c-15.2-15.2-39.9-15.2-55.2 0l-35.4 35.4c-3.8 3.8-3.8 10 0 13.8l90.2 90.2c3.8 3.8 10 3.8 13.8 0l35.4-35.4c15.2-15.3 15.2-40 0-55.2zM384 346.2V448H64V128h229.8c3.2 0 6.2-1.3 8.5-3.5l40-40c7.6-7.6 2.2-20.5-8.5-20.5H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V306.2c0-10.7-12.9-16-20.5-8.5l-40 40c-2.2 2.3-3.5 5.3-3.5 8.5z"/></svg><br>Editar</button></td>
+					<td><button @click="selectedInmueble={...inmueble}; s=true" class="action-button edit"><svg width="15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="edit" class="svg-inline--fa fa-edit fa-w-18" role="img" viewBox="0 0 576 512"><path fill="currentColor" d="M402.6 83.2l90.2 90.2c3.8 3.8 3.8 10 0 13.8L274.4 405.6l-92.8 10.3c-12.4 1.4-22.9-9.1-21.5-21.5l10.3-92.8L388.8 83.2c3.8-3.8 10-3.8 13.8 0zm162-22.9l-48.8-48.8c-15.2-15.2-39.9-15.2-55.2 0l-35.4 35.4c-3.8 3.8-3.8 10 0 13.8l90.2 90.2c3.8 3.8 10 3.8 13.8 0l35.4-35.4c15.2-15.3 15.2-40 0-55.2zM384 346.2V448H64V128h229.8c3.2 0 6.2-1.3 8.5-3.5l40-40c7.6-7.6 2.2-20.5-8.5-20.5H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V306.2c0-10.7-12.9-16-20.5-8.5l-40 40c-2.2 2.3-3.5 5.3-3.5 8.5z"/></svg><br>Editar</button></td>
 					<td><button @click="eliminar(inmueble.id)" class="action-button delete"><svg width="15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash" class="svg-inline--fa fa-trash fa-w-14" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"/></svg><br>Eliminar</button></td>
 				</tr>
         <!-- <pre>{{inmuebles}}</pre> :reload="getAll()"-->
@@ -76,7 +76,7 @@ export default {
   components: {
 	CustomModal
   },
-  data: function() {
+  data() {
     return {
       s: false,
       pages: Number,
@@ -100,8 +100,9 @@ export default {
         descripcion: null,
         creado: null,
         actualizado: null,
-        imagenes: [
-        ]
+        source_mapas: null,
+        coordenadas: null,
+        imagenes: []
       },
       selectedInmueble: {
         id: null,
@@ -119,8 +120,9 @@ export default {
         descripcion: null,
         creado: null,
         actualizado: null,
-        imagenes: [
-        ]
+        source_mapas: null,
+        coordenadas: null,
+        imagenes: []
       }
     }
   },
@@ -130,8 +132,8 @@ export default {
   apollo: {
     allInmuebles: {
       query: gql`
-        query AllInmuebles($offset: Int, $limit: Int) {
-          allInmuebles(offset: $offset, limit: $limit) {
+        query AllInmuebles($offset: Int, $limit: Int, $sort: String, $order: String) {
+          allInmuebles(offset: $offset, limit: $limit, sort: $sort, order: $order) {
             count
             results {
               id
@@ -147,6 +149,7 @@ export default {
               banos
               estrato
               contrato
+              source_mapas
               imagenes {
                 url
               }
@@ -159,7 +162,9 @@ export default {
       variables() {
         return {
           offset: this.defaultOffset*(this.current-1),
-					limit: this.defaultOffset*(this.current)
+					limit: this.defaultOffset*(this.current),
+          sort: 'DESC',
+          order: 'creado'
         }
       },
       result ({ data, loading }) {
@@ -172,47 +177,36 @@ export default {
     }
   },
   methods: {
-	  fs() {
+    fs() {
 		  console.log('a');
 	  },
-    eliminar(id) {
-      let status_code = null
-      fetch(`${process.env.VUE_APP_API}inmuebles/${id}/`,{
-        method: 'DELETE',
-        headers:{
-          'Authorization': `Bearer ${this.token}`,
-        }
-      }).then(data => {
-        status_code = data.status
-        return data
-      }).then(data => data.json()).then(json => {
-        let message = `status_code: ${status_code}\n`
-        switch (status_code) {
-            case 401:
-              console.log(json)
-              const serverResponse = json.messages?.map(m => m.message).join(', ')              
-              message += `Error: Usuario no autenticado\nDetail: ${json.detail}\nServer_Response: ${serverResponse}`
-              break
-            case 400:
-              Object.keys(json).forEach(key => {
-                message += `${key}: ${json[key].join(', ')}\n`
-                console.log(message);
-              })
-              this.$emit('reload')
-              break
-            case 201:
-              message += `Inmueble creado con éxito\nid: ${json.data.id}`
-              break
-            case 200:
-              message += `Eliminado exitosamente`
-              this.getAll()
-              break
+    async eliminar(id) {
+      await this.$store.dispatch("refreshToken", { vm: this });
+      await this.$apollo
+      .mutate({
+        mutation: gql`
+          mutation InmueblesDelete($inmuebleId: Int!) {
+            inmueblesDelete(inmuebleId: $inmuebleId)
           }
-          // console.log(json);
-          window.alert(message.toUpperCase())
+        `,
+        variables: {
+          inmuebleId: Number(id),
+          reqAuth: true,
+        },
       })
+      .then((result) => {
+        console.log(result);
+        alert(
+          "Inmueble eliminado exitosamente!!"
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+        //alert(error.graphQLErrors[0].extensions.response.body);
+      });
     }
-  },
+  }
+
 
 }
 </script>

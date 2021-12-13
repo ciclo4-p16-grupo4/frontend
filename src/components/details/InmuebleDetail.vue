@@ -1,5 +1,5 @@
 <template>
-  <section class="details" v-if="inmueble">
+  <section class="details" v-if="inmueble && !error">
 	  <div class="top-section">
       <div class="meta-title">
         <h1>{{inmueble.titulo}}</h1>
@@ -32,7 +32,7 @@
       <div class="image-gallery">
         <Gallery :imagenes="inmueble.imagenes" />
         <h4>Ubicación</h4>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31812.93796188539!2d-74.10404450950797!3d4.662142452854003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9bfd2da6cb29%3A0x239d635520a33914!2zQm9nb3TDoQ!5e0!3m2!1ses!2sco!4v1639119945081!5m2!1ses!2sco" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        <iframe v-if="inmueble.source_mapas!='' && inmueble.source_mapas!=null" :src="inmueble.source_mapas" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
 	  </div>
     <div class="bottom-section">
@@ -41,35 +41,39 @@
       <p>{{inmueble.descripcion}}</p>
     </div>
 
-  <div class="contact-form">   
-    <h1 id="tituloFormulario">¿Estas interesado?</h1>
-    <p>envia el formulario y nos pondremos en contacto</p>
-    <form v-on:submit.prevent="contactoAsesorLog" id="formulario" target="_blank">
+    <div class="contact-form">   
+      <h1 id="tituloFormulario">¿Estas interesado?</h1>
+      <p>envia el formulario y nos pondremos en contacto</p>
+      <form v-on:submit.prevent="contactoAsesorLog" id="formulario" target="_blank">
 
-      <label>Nombre y Apellido</label>
-      <input v-model="contactoAsesor.name"  type="text" placeholder="Nombre Apellido" class="formularioCampos">
+        <label>Nombre y Apellido</label>
+        <input v-model="contactoAsesor.name"  type="text" placeholder="Nombre Apellido" class="formularioCampos">
 
-      <label>Correo</label>
-      <input  v-model="contactoAsesor.email" type="email" placeholder="correo@email.com" class="formularioCampos">
+        <label>Correo</label>
+        <input  v-model="contactoAsesor.email" type="email" placeholder="correo@email.com" class="formularioCampos">
 
-      <label>Telefono</label>
-      <input  v-model="contactoAsesor.phone" type="tel" placeholder="3201234567" class="formularioCampos">
+        <label>Telefono</label>
+        <input  v-model="contactoAsesor.phone" type="tel" placeholder="3201234567" class="formularioCampos">
 
-      <select v-model="contactoAsesor.asunto" class="formularioCampos" placeholder="Asunto">
-          <option value="" disabled hidden selected>Selecciona un asunto</option>
-          <option>Quiero comprar</option>
-          <option>Quiero más información</option>
-      </select>
+        <select v-model="contactoAsesor.asunto" class="formularioCampos" placeholder="Asunto">
+            <option value="" disabled hidden selected>Selecciona un asunto</option>
+            <option>Quiero comprar</option>
+            <option>Quiero más información</option>
+        </select>
 
-      <textarea v-model="contactoAsesor.message"  id="" cols="60" rows="7" placeholder="Mensaje" class="formularioCampos"></textarea>
+        <textarea v-model="contactoAsesor.message"  id="" cols="60" rows="7" placeholder="Mensaje" class="formularioCampos"></textarea>
 
-      <button type="submit" class="button red-action formularioBoton">Enviar</button>
-    </form>
-  </div>
-
+        <button type="submit" class="button red-action formularioBoton">Enviar</button>
+      </form>
+    </div>
   </section> 
-  <section v-else class="loading">
+  <section v-if="$apollo.queries.inmuebleById.loading" class="loading">
     <img src="@/assets/loading.svg" alt="">
+  </section>
+  <section v-if="error">
+    <div class="center">
+      <h1>{{error}}</h1>
+    </div>
   </section>
 </template>
 
@@ -84,6 +88,7 @@ export default {
   name: 'Details',
   data: function() {
     return {
+      error: null,
       inmueble: null,
       inmuebleId: Number(this.$route.params.id),
       contactoAsesor: {
@@ -119,6 +124,7 @@ export default {
             contrato
             descripcion
             coordenadas
+            source_mapas
             imagenes {
               url
             }
@@ -130,11 +136,15 @@ export default {
           inmuebleId: this.inmuebleId
         }
       },
-      result ({ data, loading }) {
+      result ({ data, loading, response }) {
 				if (!loading) {
 					this.inmueble = data.inmuebleById
 				}
 			},
+      error(error) {
+        this.error = error
+        console.log('ERROR: ', error);
+      }
     }
   }
 }
@@ -245,5 +255,13 @@ h2 {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
+}
+
+.center {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  height: 600px;
 }
 </style>

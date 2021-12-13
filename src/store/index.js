@@ -101,9 +101,9 @@ export default createStore({
       }
     },
 
-    async refreshToken({ dispatch, commit }) {
+    async refreshToken({ dispatch, commit }, {vm}) {
       if(this.state.is_auth) {
-        await this.$apollo
+        await vm.$apollo
         .mutate({
           mutation: gql`
             mutation ($refresh: String!) {
@@ -117,7 +117,7 @@ export default createStore({
             },
           })
           .then((result) => {
-            this.state.loguedUser.access_token = json.access
+            this.state.loguedUser.access_token = result.data.refreshToken.access
             localStorage.setItem("token_access", result.data.refreshToken.access);
             dispatch('verifyAuth')
           })
