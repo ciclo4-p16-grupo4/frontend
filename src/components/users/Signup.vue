@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import gql from 'graphql-tag'
 
 export default {
     name: "SignUp",
@@ -48,29 +48,60 @@ export default {
   },
           
   methods: {
-      processSignUp: function(){
-        axios.post(
-        `${process.env.VUE_APP_API}user/`,
-        this.user,
-        {headers: {'Content-Type': 'application/json'}}
-        )
+      processSignUp: async function(){
+        
+        await this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation SignUpUser($userInput: SignUpInput) {
+              signUpUser(userInput: $userInput) {
+                refresh
+                access
+              }
+            }
+          `,
+          variables: {
+            userInput: this.user,
+          },
+        })
         .then((result) => {
           let dataSignUp = {
             username: this.user.username,
-            token_access: result.data.access,
-            token_refresh: result.data.refresh,
+            token_access: result.data.signUpUser.access,
+            token_refresh: result.data.signUpUser.refresh,
           }
 
-          this.$store.dispatch('completedLogIn', {param: dataSignUp})
-
+          this.$store.dispatch('completedLogIn', {param: dataSignUp, vm: this})
         })
         .catch((error) => {
-            
           console.log(error)
-
           alert("ERROR: Fallo en el registro.");
-      
         });
+
+
+
+        // axios.post(
+        // `${process.env.VUE_APP_API}user/`,
+        // this.user,
+        // {headers: {'Content-Type': 'application/json'}}
+        // )
+        // .then((result) => {
+        //   let dataSignUp = {
+        //     username: this.user.username,
+        //     token_access: result.data.access,
+        //     token_refresh: result.data.refresh,
+        //   }
+
+        //   this.$store.dispatch('completedLogIn', {param: dataSignUp})
+
+        // })
+        // .catch((error) => {
+            
+        //   console.log(error)
+
+        //   alert("ERROR: Fallo en el registro.");
+      
+        // });
       }
     }
 }

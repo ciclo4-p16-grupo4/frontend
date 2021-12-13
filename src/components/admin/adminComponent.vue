@@ -56,78 +56,124 @@
 				</tr>
         <!-- <pre>{{inmuebles}}</pre> :reload="getAll()"-->
 			</table>
+      
 		</div>
+    <div class="pagination-container">
+        <a class="previous-page" @click="current--" :class="{'inactiveB': current==1}" >Anterior</a>
+        <a class="button-pagination-page" v-for="page in pages" :key="page" :class="{'current-page': page==current}" @click="current=page">{{page}}</a>
+        <a class="next-page" @click="current++" :class="{'inactiveB': !(current < pages)}"  >Siguiente</a>
+      </div>
 		<CustomModal :showModal="s" v-on:close="s=false" :inmueble="selectedInmueble" />
 
 	</section>
 </template>
 <script>
 import CustomModal  from './CustomModal.vue'
+import gql from 'graphql-tag'
 
 export default {
   name: "AdminComponent",
   components: {
 	CustomModal
   },
-  data() {
-	return {
-		s: false,
-    inmuebles: Array,
-    token: this.$store.state.loguedUser.access_token,
-    newInmueble: {
-      id: null,
-      titulo: null,
-      direccion: null,
-      ciudad: null,
-      poblacion: null,
-      tipo: null,
-      precio: null,
-      area: null,
-      habitaciones: null,
-      banos: null,
-      estrato: null,
-      contrato: null,
-      descripcion: null,
-      creado: null,
-      actualizado: null,
-      imagenes: [
-      ]
-    },
-		selectedInmueble: {
-      id: null,
-      titulo: null,
-      direccion: null,
-      ciudad: null,
-      poblacion: null,
-      tipo: null,
-      precio: null,
-      area: null,
-      habitaciones: null,
-      banos: null,
-      estrato: null,
-      contrato: null,
-      descripcion: null,
-      creado: null,
-      actualizado: null,
-      imagenes: [
-      ]
+  data: function() {
+    return {
+      s: false,
+      pages: Number,
+		  current: 1,
+      defaultOffset: 12,
+      inmuebles: Array,
+      token: this.$store.state.loguedUser.access_token,
+      newInmueble: {
+        id: null,
+        titulo: null,
+        direccion: null,
+        ciudad: null,
+        poblacion: null,
+        tipo: null,
+        precio: null,
+        area: null,
+        habitaciones: null,
+        banos: null,
+        estrato: null,
+        contrato: null,
+        descripcion: null,
+        creado: null,
+        actualizado: null,
+        imagenes: [
+        ]
+      },
+      selectedInmueble: {
+        id: null,
+        titulo: null,
+        direccion: null,
+        ciudad: null,
+        poblacion: null,
+        tipo: null,
+        precio: null,
+        area: null,
+        habitaciones: null,
+        banos: null,
+        estrato: null,
+        contrato: null,
+        descripcion: null,
+        creado: null,
+        actualizado: null,
+        imagenes: [
+        ]
+      }
     }
-	}
   },
-  created(){
+  mounted(){
+    
+  },
+  apollo: {
+    allInmuebles: {
+      query: gql`
+        query AllInmuebles($offset: Int, $limit: Int) {
+          allInmuebles(offset: $offset, limit: $limit) {
+            count
+            results {
+              id
+              likes
+              titulo
+              tipo
+              ciudad
+              direccion
+              poblacion
+              precio
+              habitaciones
+              area
+              banos
+              estrato
+              contrato
+              imagenes {
+                url
+              }
+              coordenadas
+              descripcion
+            }
+          }
+        }
+      `,
+      variables() {
+        return {
+          offset: this.defaultOffset*(this.current-1),
+					limit: this.defaultOffset*(this.current)
+        }
+      },
+      result ({ data, loading }) {
+				if (!loading) {
+          console.log(data.allInmuebles);
+					this.inmuebles = data.allInmuebles.results
+          this.pages = Math.ceil(Number(data.allInmuebles.count/this.defaultOffset))
+				}
+			}
+    }
   },
   methods: {
 	  fs() {
 		  console.log('a');
-	  },
-	  getAll() {
-      let status_code = null
-      fetch(`${process.env.VUE_APP_API}inmuebles/?order_by=creado&sort=DESC&limit=10000`).then(data => {
-        status_code = data.status
-        return data
-      }).then(data => data.json()).then(json => {
-        this.inmuebles = json.results
-      })    
 	  },
     eliminar(id) {
       let status_code = null
@@ -167,9 +213,7 @@ export default {
       })
     }
   },
-  mounted() {
-    this.getAll()
-  }
+
 }
 </script>
 <style scoped>
@@ -267,5 +311,73 @@ tr:nth-child(even) {
 }
 .btn-add-new {
 	border: 2px dashed black;
+}
+
+
+.label {
+	margin: 20px 0px;
+}
+
+.inactiveB {
+	display: none;
+}
+
+.previous-page {
+	margin-left: 20px;
+	padding: 10px;
+	background-color: var(--oposite-color);
+	border-radius: 5px;
+	border: 1px solid transparent;
+}
+
+.previous-page:hover {
+	border: 1px solid var(--color-principal);
+}
+
+.previous-page:active {
+	background-color: var(--color-principal);
+	color: var(--oposite-color);
+}
+
+.next-page:active {
+	background-color: var(--color-principal);
+	color: var(--oposite-color);
+}
+.next-page {
+	margin-left: 20px;
+	padding: 10px;
+	background-color: var(--oposite-color);
+	border-radius: 5px;
+	border: 1px solid transparent;
+}
+
+.next-page:hover {
+	border: 1px solid var(--color-principal);
+}
+.current-page {
+	background-color: var(--color-principal)!important;
+	color: var(--oposite-color)
+}
+
+.button-pagination-page:hover {
+	background-color: var(--color-principal);
+	color: var(--oposite-color);
+}
+
+.button-pagination-page {
+	
+	padding: 10px;
+	background-color: var(--oposite-color);
+	margin: 0px 10px;
+	border-radius: 5px;
+}
+.pagination-container a{
+	cursor: pointer;
+}
+.pagination-container {
+	padding: 50px 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 </style>
