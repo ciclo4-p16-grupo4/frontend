@@ -204,6 +204,7 @@ export default {
         console.log(error);
         //alert(error.graphQLErrors[0].extensions.response.body);
       });
+      this.$apollo.queries.allInmuebles.refetch();
     }
   }
 
