@@ -43,10 +43,12 @@
         <a class="button red-action" href="/user/login">Iniciar sesión</a>
       </div>
       <div v-else class="user-loggedin">
-        <strong>{{$store.state.loguedUser.username}}
-          <strong v-if="$store.state.loguedUser.is_staff">(Admin)</strong>
-          <strong v-else>(Usuario)</strong>
-        </strong>
+        <a href="../profile">
+          <strong>{{$store.state.loguedUser.username}}
+            <strong v-if="($store.state.loguedUser.is_staff === 'true')">(Admin)</strong>
+            <strong v-else>(Usuario)</strong>
+          </strong>
+        </a>
         <div class="loggedin-btn">
           <button class="button" @click="$store.dispatch('logOut')">Cerrar Sesión</button>
         </div>
@@ -66,6 +68,10 @@ export default {
 }
 </script>
 <style scoped>
+.user-loggedin a {
+  color: var(--oposite-color);
+  text-decoration: underline;
+}
 .loggedin-btn {
   display: flex;
   align-items: center;

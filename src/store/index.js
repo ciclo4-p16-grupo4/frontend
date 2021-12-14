@@ -96,7 +96,9 @@ export default createStore({
           refresh_token: localStorage.getItem("token_refresh"),
           username: localStorage.getItem("username"),
           user_id: localStorage.getItem("user_id"),
-          is_staff: localStorage.getItem("is_staff")
+          is_staff: localStorage.getItem("is_staff"),
+          email: localStorage.getItem("email"),
+          ciudad: localStorage.getItem("ciudad")
         }
       }
     },

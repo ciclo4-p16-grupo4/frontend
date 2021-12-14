@@ -72,7 +72,7 @@
 </template>
 
 <script>
-// @ is an alias to /src
+import gql from 'graphql-tag'
 
 export default {
   name: 'InmuebleCard',
@@ -81,8 +81,43 @@ export default {
   },
 
   methods: {
-	like() {
-		console.log('like');
+	async like() {
+		if(this.$store.state.is_auth) {
+			const user_id = localStorage.getItem("user_id")
+			
+			await this.$store.dispatch("refreshToken", { vm: this });
+			await this.$apollo
+			.mutate({
+			mutation: gql`
+				mutation Mutation($like: likeuserInput!) {
+					createLike(like: $like) {
+						id
+						user_id
+						inmueble_id
+						creado
+					}
+				}
+				`,
+				variables: {
+					like: {
+						user_id: Number(user_id),
+						inmueble_id: Number(this.inmueble.id) 
+					},
+					reqAuth: true
+				},
+			})
+			.then((result) => {
+				console.log(result);
+				alert(`Te gusto el inmueble #${this.inmueble.id} ${this.inmueble.titulo}`);
+			})
+			.catch((error) => {
+				console.log(error)
+				alert("ERROR: Fallo en el registro.");
+			});
+		}else {
+			window.alert('Inicie sesión para dar like')
+			window.location.href="./user/login"
+		}
 	}
   }
 }
