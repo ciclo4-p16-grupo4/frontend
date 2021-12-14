@@ -9,6 +9,7 @@ import Login from '../components/users/Login.vue'
 import MapResults from '../components/search/MapResults.vue'
 import ListResults from '../components/search/ListResults.vue'
 import Error404Page from '../components/home/404Page.vue'
+import Profile from '../components/profile/Profile.vue'
 import store from '../store/index.js'
 
 const routes = [
@@ -71,7 +72,11 @@ const routes = [
     component: Admin,
     meta: { requiresAuth: true }
   },
-
+  {
+    path: '/profile',
+    name: "profile",
+    component: Profile
+  },
   /** 404 Not found */
   {
     path: '/:pathMatch(.*)*',
