@@ -12,39 +12,41 @@
     <div class="search-options">
       <div class="search-options-inputs">
           <fieldset>
-          <label for="ubicacion">Ubicación</label>
-          <select name="ubicacion" id="ubicacion" v-model="buscar.ciudad">
+          <label for="ubicacion">Buscar</label>
+          <input v-model="buscar.q" type="text" name="ubicacion" id="ubicacion" placeholder="Casa en el mar">
+          <!-- <select name="ubicacion" id="ubicacion" v-model="buscar.ciudad">
             <option value="null" selected disabled>Ubicación</option>
             <template v-for="dep in ciudades" :key="dep.id">
               <option v-for="ciudades in dep.ciudades" :key="ciudades"  :value="ciudades">{{ciudades}}, {{pais}}</option>
             </template>
             
-          </select>
+          </select> -->
         </fieldset>
 
-        <fieldset>
+        <!-- <fieldset>
           <label for="tipo">Tipo</label>
           <div class="tipo-area">
             <select name="tipo" id="tipo" v-model="buscar.tipo">
-              <option value="APT" selected>Apartamento, </option>
-              <option value="CAS">Casa, </option>
-              <option value="LOC">Local, </option>
+              <option value="DISABLED" selected disabled>Buscar casa</option>
+              <option value="APT">Apartamento</option>
+              <option value="CAS">Casa</option>
+              <option value="LOC">Local</option>
             </select>
             <input type="text" name="area" id="" v-model="buscar.area"><label for="area">m²</label>
           </div>
-        </fieldset>
+        </fieldset> -->
 
-        <fieldset class="">
+        <!-- <fieldset class="">
           <label for="tipo">Precio</label>
           <div class="precio">
             $<input type="number" name="" id="" v-model="buscar.precioMI">
             - $ <input type="number" name="" id="" v-model="buscar.precioMX">
           </div>
-        </fieldset>
+        </fieldset> -->
       </div>
 
       <div class="buscar-button">
-        <a target="_blank" href="https://google.com" class="button red-action buscar">Buscar Propiedad</a>
+        <a target="_blank" :href="'./search/list?q='+buscar.q" class="button red-action buscar">Buscar Propiedad</a>
       </div>
     </div>    
   </nav>
@@ -62,11 +64,7 @@ export default {
       pais: 'Colombia',
       ciudades,
       buscar: {
-        ciudad: null,
-        tipo: null,
-        area: null,
-        precioMI: null,
-        precioMX: null
+        q: null
       }
     }
   }
@@ -169,6 +167,15 @@ input[type="radio"]{
   align-items: center;
   font-size: 18px;
 }
+
+.search-options-inputs input {
+  width: 750px;
+  height: 50px;
+  border: none;
+  font-weight: 500;
+  font-size: 18px;
+  border: 1px solid #6666;
+}
 .precio input{
   width: 80px;
   height: 30px;
@@ -182,13 +189,13 @@ input[type="radio"]{
   color: var(--font-color);
 }
 .tipo-area select {
-  width: 45%;
+  /* width: 45%; */
   /* margin-right: 10px; */
 }
 
 .tipo-area select {
-  -moz-appearance: none;
-  -webkit-appearance: none;
+  /* -moz-appearance: none;
+  -webkit-appearance: none; */
 }
 
 .tipo-areaselect::-ms-expand {
